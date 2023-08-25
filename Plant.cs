@@ -8,6 +8,7 @@ public class Plant
     public decimal AskingPrice { get; set; } // the type here is a decimal. it is more precise than double, but takes more memory and is slower.
     public string City { get; set; } // this data type is a string
     public int ZIP { get; set; } // this data type is an integer
+    public DateTime AvailableUntil { get; set; }
     public bool Sold { get; set; } // this data type is a boolean (true or false)
 }
 
