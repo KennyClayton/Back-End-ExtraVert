@@ -24,7 +24,7 @@ List<Plant> plants = new List<Plant>() // Plant is a custom class. plants is the
     new Plant()
     {
         Species = "Hibiscus",
-        LightNeeds = 2,
+        LightNeeds = 5,
         AskingPrice = 18.00M,
         City = "Ponte Vedra",
         ZIP = 32082,
@@ -44,12 +44,12 @@ List<Plant> plants = new List<Plant>() // Plant is a custom class. plants is the
     new Plant()
     {
         Species = "Queen Palm",
-        LightNeeds = 5,
+        LightNeeds = 2,
         AskingPrice = 130.00M,
         City = "Jax Beach",
         ZIP = 32255,
         AvailableUntil = new DateTime(2024, 6, 8),
-        Sold = false
+        Sold = true
     },
     new Plant()
     {
@@ -217,23 +217,76 @@ void PostPlant()
     // all of this through about line 233 displays to the user and promts the user for their input as they create a new plant to be posted...
     Console.WriteLine(
         @$"Please complete the form below:");
+
     Console.WriteLine("Species: ");
     string speciesResponse = Console.ReadLine().Trim();
+
     Console.WriteLine("Light Needs: (choose a number 1 - 5)");
     int lightNeedsResponse = int.Parse(Console.ReadLine().Trim());
+
     Console.WriteLine("Asking Price: ");
     int askingPriceResponse = int.Parse(Console.ReadLine().Trim());
+
     Console.WriteLine("City: ");
     string cityResponse = Console.ReadLine().Trim();
+
     Console.WriteLine("ZIP: ");
     int zipResponse = int.Parse(Console.ReadLine().Trim());
-    Console.WriteLine("How long should this post last? Let's start with the day of the moneth you want the post to expire (DD): ");
-    int dayResponse = int.Parse(Console.ReadLine());
-    Console.WriteLine("Please enter a Month (MM): ");
-    int monthResponse = int.Parse(Console.ReadLine());
-    Console.WriteLine("Please enter a Year (YYYY): ");
-    int yearResponse = int.Parse(Console.ReadLine());
 
+
+    //^BEGIN THE MADNESS OF TRYING TO CATCH THESE ERRORS
+    //^DAY
+    int dayResponse = 0;
+    bool validDayInput = false;
+    while (!validDayInput)
+    {// while (!validInput)
+        try
+        {
+            Console.WriteLine("How long should this post last? Let's start with the day of the month you want the post to expire (DD): ");
+            dayResponse = int.Parse(Console.ReadLine());
+            validDayInput = true;
+        }
+        catch (FormatException)
+        {
+            Console.WriteLine("Please type only integers!");
+        }
+    }
+
+    //^MONTH
+    int monthResponse = 0; //had to declare outside the try block because i need monthResponse variable further down the code...so inside the try block i removed "int" before "monthResponse" since i already declared it an integer type...
+    bool validMonthInput = false;
+    while (!validMonthInput)
+    {
+        try //try taking the input from the user and see if it works...if not...refer to "catch" on how to handle
+        {
+            Console.WriteLine("Please enter a Month (MM): ");
+            monthResponse = int.Parse(Console.ReadLine());
+            validMonthInput = true;
+        }
+        catch (FormatException) //when the user types letters instead of numbers I want the below error to pop up and then for the user to be prompted again.
+        {
+            Console.WriteLine("Please type only integers between 1 - 12");
+        }
+    }
+
+    //^YEAR
+    int yearResponse = 0; //set initial value to zero
+    bool validYearInput = false;
+    while (!validYearInput)
+    try
+    {
+        Console.WriteLine("Please enter a Year (YYYY): ");
+        yearResponse = int.Parse(Console.ReadLine());
+        validYearInput = true;
+    }
+    catch (FormatException)
+    {
+        Console.WriteLine("Please type only a 4-digit integer");
+    }
+    //^END THE MADNESS OF TRYING TO CATCH THESE ERRORS
+    
+    
+    
     // need to combine the three date cariables into one maybe? but why?
     // because the format for DateTime has to be in a certain format with at least three 
     DateTime availableUntilDate = new DateTime(yearResponse, monthResponse, dayResponse);
@@ -356,7 +409,7 @@ void RandomPlant() //
     }
 
     // Now you have the suitablePlantIndex, so you can use it to access the plant details
-    Console.WriteLine(@$"Details on this random plant:
+    Console.WriteLine(@$"Details on this random plant: 
     Species: {plants[suitablePlantIndex].Species}
     Location: {plants[suitablePlantIndex].City}, {plants[suitablePlantIndex].ZIP}
     Light Needs: {plants[suitablePlantIndex].LightNeeds}
@@ -447,7 +500,7 @@ void ViewStatistics()
 
     List<Plant> MatchingPlants = new List<Plant>();
     int totalPlants = plants.Count;
-        int totalAvailablePlants = totalPlants - MatchingPlants.Count;
+    int totalAvailablePlants = totalPlants - MatchingPlants.Count;
 
     for (int i = 0; i < plants.Count; i++) // iterate through all plants and do this next piece for each one...
     {
@@ -457,43 +510,78 @@ void ViewStatistics()
             MatchingPlants.Add(plants[i]); // this line adds each plant being iterated over if it matches the criteria.
             //...then subtract totalPlants from the number of  MatchingPlants.Count
         }
-        
+
     }
     Console.WriteLine($"Total Number of Available Plants: {totalAvailablePlants}");
 
 
     //^ Name of plant with highest light needs
     // loop through all plants and capture whichever plant has the highest (may not necessarily be 5)
-        // how to loop? foreach
-        // how to capture? int variableName can hold the value of the 0-indexed plant
-            //designate index zero plant as the initializer...the comparable plant
-    int highestLightNeedPlantIndex = plants[0].LightNeeds;
-    string highestLightNeedPlantName = plants[0].Species;
-    
-    foreach (Plant plant in plants) 
-    {
+    // how to loop? foreach
+    // how to capture? int variableName can hold the value of the 0-indexed plant
+    //designate index zero plant as the initializer...the comparable plant
+    int highestLightNeedPlantIndex = 0;
+    string highestLightNeedPlantName = "";
 
+    foreach (Plant plant in plants)
+    {
+        if (plant.LightNeeds > highestLightNeedPlantIndex) //...if LightNeeds value is more than the previous plant's LightNeeds value....
+        {
+            highestLightNeedPlantIndex = plant.LightNeeds; //then update highestLightNeedPlantIndex value
+            highestLightNeedPlantName = plant.Species;
+        }
     };
+    Console.WriteLine($"Plant With Highest Light Needs: {highestLightNeedPlantName}");
 
     //^ Average light needs
+    // add up all the lightneeds integers, divide by plants.count, display with WriteLine
+    int totalLightNeeds = 0;
+
+    foreach (Plant plant in plants)
+    {
+        totalLightNeeds += plant.LightNeeds;
+        // Console.WriteLine(totalLightNeeds);
+    }
+    int averageLightNeeds = totalLightNeeds / totalPlants;
+    Console.WriteLine($"Average Light Needs: {averageLightNeeds}");
 
 
     //^ Percentage of plants adopted
+    // total plants divided by adopted plants
+    //already have a totalPlants variable holding that number
+    //now I need a variable to hold adopted Plants
+    //
+    List<Plant> MatchingAdoptedPlants = new List<Plant>(); //create a new instance of a Plant-type plant so I can hold a list of plants as I filter through below
+    foreach (Plant plant in plants)
+    {
+        if (plant.Sold)
+        { //...if the value of Sold is true, then it is an adopted plant and the plant should be added to a list of plants which we can .Count on to get the total
+            MatchingAdoptedPlants.Add(plant);
+        };
+    }
+    int adoptedPlants = MatchingAdoptedPlants.Count; //adoptedPlants variable will hold the number of adopted plants from the MatchingAdoptedPlants list
 
+    Console.WriteLine($"Adopted Plants {adoptedPlants}");
 
+    // Floor division - "The result you will get when dividing integers that result in a non-whole number will be rounded down (which is why 1/2 will give you 0). This is called floor division."
+    //* Think of floor division like an elevator: if the elevator gets stuck between floor 1 and 2, the elevator defaults to the lower floor because it CAN go down, but it cannot get up to floor 2. So Floor division is the same. It rounds down to nearest whole floor/number.
+
+    decimal ratioAdopted = (decimal)adoptedPlants / totalPlants; //Since adopedPlants and totalPlants are both integer types....this would equate to an integer (and leave no decimal) if I didn't cast adoptedPlants as a decimal. ... or I could have cast totalPlants as a decimal?
+    double ratioAsDouble = (double)ratioAdopted; //convert the variable TYPE of ratioAdopted from decimal to double. Literally read, it would say "This data type is a "double" which can give decimal numbers....the variable ratioAsDouble  will hold the value of another double-type piece of data called ratioAdopted.
+    // now we have 0 stored in ratioAsDouble so we need to do math on it...
+    //* Why use the double data type? ChatGPT "Without the use of double, you would lose precision and get inaccurate results." and "You use double when you need to work with numbers that require decimal points or fractions, such as measurements, scientific calculations, financial calculations, and more. It's suitable for situations where precision matters and integer types won't suffice."
+    double half = ratioAsDouble / 2;
+    Console.WriteLine($"Ratio {ratioAdopted}");
+    decimal wholeNumberAdopted = ratioAdopted * 100;
+    Console.WriteLine($"Percentage of Adopted Plants: {wholeNumberAdopted}%");
 }
 
 
-// {
-//     //store it in thisPlantPrice// Lowest price plant name
-//     decimal lowestPrice = decimal.MaxValue;
-//     string lowestPricePlantName = "";
-//     foreach (var plant in plants)
-//     {
-//         if (plant.AskingPrice < lowestPrice)
-//         {
-//             lowestPrice = plant.AskingPrice;
-//             lowestPricePlantName = plant.Species;
-//         }
-//     }
-// }
+string PlantDetails(Plant plant) //declare the type of return for this metho here. We are getting a string in return after the method/function runs. So instead of declaring the PlantDetails method with "void" in front of it, we declare it as a string TYPE...
+//* There is only one parameter for this method/function: plant. We show capital "Plant" in front of plant because we need to declare the Parameter type.
+{
+    string plantString = plant.Species; // plantString is a string type variable.
+    
+    return plantString; //we're returning a string, as explicitly stated when we declared the PlanDetails method above.
+
+}
