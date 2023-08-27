@@ -273,20 +273,20 @@ void PostPlant()
     int yearResponse = 0; //set initial value to zero
     bool validYearInput = false;
     while (!validYearInput)
-    try
-    {
-        Console.WriteLine("Please enter a Year (YYYY): ");
-        yearResponse = int.Parse(Console.ReadLine());
-        validYearInput = true;
-    }
-    catch (FormatException)
-    {
-        Console.WriteLine("Please type only a 4-digit integer");
-    }
+        try
+        {
+            Console.WriteLine("Please enter a Year (YYYY): ");
+            yearResponse = int.Parse(Console.ReadLine());
+            validYearInput = true;
+        }
+        catch (FormatException)
+        {
+            Console.WriteLine("Please type only a 4-digit integer");
+        }
     //^END THE MADNESS OF TRYING TO CATCH THESE ERRORS
-    
-    
-    
+
+
+
     // need to combine the three date cariables into one maybe? but why?
     // because the format for DateTime has to be in a certain format with at least three 
     DateTime availableUntilDate = new DateTime(yearResponse, monthResponse, dayResponse);
@@ -396,25 +396,36 @@ void DelistPlant()
 //     }
 void RandomPlant() // 
 {
-    int suitablePlantIndex = 10; // Initialize to an invalid value. I asked why not null. CGPT said because memory expects an integer basically. Not a reference to an object.
-    while (suitablePlantIndex == 10) // Keep looping until a suitable plant is found
+    int suitablePlantIndex = -1; // Initialize to an invalid value. I asked why not null. CGPT said because memory expects an integer basically. Not a reference to an object.
+    while (suitablePlantIndex == -1) // Keep looping until a suitable plant is found
     {
-        int randomPlant = random.Next(0, plants.Count); // Generate a random index
-        Console.WriteLine(randomPlant); //i want to see what tries were attempted
-        if (!plants[randomPlant].Sold) // Check if the plant is available
+        //^ capture an index number from a random plant...
+        int randomPlant = random.Next(0, plants.Count); //  Generate a random index between zero and total number of plants (which we know is 5)
+        // Console.WriteLine(randomPlant); //i want to see what tries were attempted so I am logging each loop
+        //^if that random plant is NOT sold...
+        if (!plants[randomPlant].Sold) // Check if the randomly-selected plant is NOT sold...
         {
-            suitablePlantIndex = randomPlant; // Store the index of the suitable plant
+            //^store the plant's index number as new value of randomPlant above
+            suitablePlantIndex = randomPlant; // ...if not sold, then store the index of the suitable plant
+            //^then exit the loop
             break; // Exit the loop
         }
     }
 
     // Now you have the suitablePlantIndex, so you can use it to access the plant details
-    Console.WriteLine(@$"Details on this random plant: 
-    Species: {plants[suitablePlantIndex].Species}
-    Location: {plants[suitablePlantIndex].City}, {plants[suitablePlantIndex].ZIP}
-    Light Needs: {plants[suitablePlantIndex].LightNeeds}
-    Price: {plants[suitablePlantIndex].AskingPrice}
-    ");
+    //Call the PlantDetails method we created at bottom of this file here to list this plant's details
+    //What happened above is:
+        //we used a while loop AND a random.Next METHOD to keep looping through the plants List at random until it found a plant that matched the criteria (of not being sold)...and we stored that plant's INDEX integer in the randomPlant variable. I then WriteLine'd so I could see each of those integers as the while loop was running...didn't need to but wanted to see it...
+        //...then IF that plants[0] was .sold...we stored that INDEX integer in suitablePlantIndex variable
+        //...then we exited the loop with BREAK...
+        //...then, below, we used an if statement to say 
+    //^then if 
+    if (suitablePlantIndex != 10) //now if a plant was found to meet the above criteria, we want to print this string below...
+    {
+        Plant suitablePlant = plants[suitablePlantIndex]; //then take the index of that plant, look at that plant object in the plants list....and store that plant object in the suitablePlant variable...then...
+        string formattedPlant = PlantDetails(suitablePlant); //
+        Console.WriteLine(formattedPlant);
+    }
 }
 
 
@@ -580,8 +591,13 @@ void ViewStatistics()
 string PlantDetails(Plant plant) //declare the type of return for this metho here. We are getting a string in return after the method/function runs. So instead of declaring the PlantDetails method with "void" in front of it, we declare it as a string TYPE...
 //* There is only one parameter for this method/function: plant. We show capital "Plant" in front of plant because we need to declare the Parameter type.
 {
-    string plantString = plant.Species; // plantString is a string type variable.
-    
+    string plantString = // plantString is a string type variable
+    @$"Details on this random plant:" + "\n" + 
+    "Species: " + plant.Species + "\n" + // we are concatenating with plus symbol
+    "Location: " + plant.City + "\n" +
+    "Light Needs: " + plant.LightNeeds + "\n" +
+    "Price: " + " " + plant.AskingPrice;
+
     return plantString; //we're returning a string, as explicitly stated when we declared the PlanDetails method above.
 
 }
